@@ -339,6 +339,14 @@ private:
     // for as long as possible.  The memory is only freed when it is needed for another log writer.
     Vector< sp<NBLog::Writer> > mUnregisteredWriters;
     Mutex               mUnregisteredWritersLock;
+    
+public:
+    status_t    setAppVolume(const String8& packageName, const float value);
+    status_t    setAppMute(const String8& packageName, const bool value);
+    status_t    listAppVolumes(std::vector<media::AppVolume> *vols);
+
+private:
+    std::map<String8, media::AppVolume>  mAppVolumeConfigs;
 
 public:
     // Life cycle of gAudioFlinger and AudioFlinger:
