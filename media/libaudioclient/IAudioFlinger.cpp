@@ -954,6 +954,26 @@ Status AudioFlingerServerAdapter::setMasterBalance(float balance) {
 Status AudioFlingerServerAdapter::getMasterBalance(float* _aidl_return) {
     return Status::fromStatusT(mDelegate->getMasterBalance(_aidl_return));
 }
+    
+Status AudioFlingerServerAdapter::setAppVolume(const std::string& packageName, const float value) {
+    String8 packageNameLegacy = VALUE_OR_RETURN_BINDER(
+            aidl2legacy_string_view_String8(packageName));
+    return Status::fromStatusT(mDelegate->setAppVolume(packageNameLegacy, value));
+}
+
+Status AudioFlingerServerAdapter::setAppMute(const std::string& packageName, const bool value) {
+    String8 packageNameLegacy = VALUE_OR_RETURN_BINDER(
+            aidl2legacy_string_view_String8(packageName));
+    return Status::fromStatusT(mDelegate->setAppMute(packageNameLegacy, value));
+}
+
+Status AudioFlingerServerAdapter::listAppVolumes(std::vector<media::AppVolumeData>* _aidl_return) {
+    std::vector<media::AppVolume> resultLegacy;
+    RETURN_BINDER_IF_ERROR(mDelegate->listAppVolumes(&resultLegacy));
+    *_aidl_return = VALUE_OR_RETURN_BINDER(convertContainer<std::vector<media::AppVolumeData>>(
+            resultLegacy, media::legacy2aidl_AppVolume));
+    return Status::ok();
+}    
 
 Status AudioFlingerServerAdapter::setStreamVolume(AudioStreamType stream, float value,
                                                   int32_t output) {
