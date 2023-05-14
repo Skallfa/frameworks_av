@@ -318,6 +318,28 @@ status_t AudioFlingerClientAdapter::setMasterBalance(float balance) {
 status_t AudioFlingerClientAdapter::getMasterBalance(float* balance) const{
     return statusTFromBinderStatus(mDelegate->getMasterBalance(balance));
 }
+    
+status_t AudioFlingerClientAdapter::setAppVolume(const String8& packageName, const float value) {
+    std::string packageNameAidl = VALUE_OR_RETURN_STATUS(
+            legacy2aidl_String8_string(packageName));
+    return mDelegate->setAppVolume(packageNameAidl, value).transactionError();
+}
+
+status_t AudioFlingerClientAdapter::setAppMute(const String8& packageName, const bool value) {
+    std::string packageNameAidl = VALUE_OR_RETURN_STATUS(
+            legacy2aidl_String8_string(packageName));
+    return mDelegate->setAppMute(packageNameAidl, value).transactionError();
+}
+
+status_t AudioFlingerClientAdapter::listAppVolumes(std::vector<media::AppVolume>* vols) {
+    std::vector<media::AppVolumeData> aidlRet;
+    RETURN_STATUS_IF_ERROR(mDelegate->listAppVolumes(&aidlRet).transactionError());
+    if (vols != nullptr) {
+        *vols = VALUE_OR_RETURN_STATUS(
+            convertContainer<std::vector<media::AppVolume>>(aidlRet, media::aidl2legacy_AppVolume));
+    }
+    return OK;
+}    
 
 status_t AudioFlingerClientAdapter::setStreamVolume(audio_stream_type_t stream, float value,
                                                     audio_io_handle_t output) {
